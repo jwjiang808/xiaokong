@@ -4,66 +4,37 @@ build-backend = "hatchling.build"
 
 [project]
 name = "xiaokong"
-version = "0.2.0"
-description = "小控 - 你的专用课程助手（Flet 桌面端）"
-readme = "README.md"
+version = "0.3.0"
+description = "小控 - 你的专用课程助手（FastAPI 后端 + Flet 前端）"
 requires-python = ">=3.11,<4.0"
-license = { text = "MIT" }
 dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "python-multipart>=0.0.9",
+  "python-dotenv>=1.0",
+  "deepagents==0.7.28",
+  "langchain-openai>=1.7,<2.0",
+  "httpx==0.28.1",
   "flet==1.0.3",
   "flet-cli==1.0.3",
   "flet-desktop==1.0.3",
   "flet-audio==1.0.3",
   "flet-audio-recorder==1.0.3",
-  "httpx==0.28.1",
-  "python-dotenv>=1.0",
-  # deepagents -> google-genai requires websockets<17; 15+ has the
-  # additional_headers/proxy parameters our Doubao client uses.
-  "websockets>=15,<17",
   "miniaudio==1.71",
   "numpy>=2.0",
   "markitdown[pdf,docx,pptx,xlsx,xls]==0.1.8",
-  # Agent layer. 0.7.28 is the latest 0.7.x release (2026-10).
-  "deepagents==0.7.28",
-  "langchain-openai>=1.7,<2.0",
 ]
 
 [project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "pytest-asyncio>=0.24",
-  "ruff>=0.6",
-]
 packaging = ["pyinstaller==6.22.3"]
 
-[project.scripts]
-xiaokong = "xiaokong.ui.app:run"
-
 [tool.hatch.build.targets.wheel]
-packages = ["src/xiaokong"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
-
-[tool.ruff]
-line-length = 88
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
-
-[tool.ruff.lint.per-file-ignores]
-# Chinese prompt prose and the generated base64 secret blob are intentionally
-# kept on single lines.
-"src/xiaokong/config.py" = ["E501"]
-"src/xiaokong/embedded_secrets.py" = ["E501"]
+packages = ["backend", "frontend"]
 
 [tool.flet]
 org = "local.xiaokong"
 product = "小控-你的专用课程助手"
 company = "Local"
-copyright = "Copyright (C) 2026"
 
 [tool.flet.app]
 path = "."

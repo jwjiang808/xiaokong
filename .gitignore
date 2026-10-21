@@ -1,0 +1,32 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.idea/
+.vscode/
+
+# Local secrets / per-machine configuration — NEVER commit these
+.env
+.env.*
+!.env.example
+embedded_secrets.py
+src/xiaokong/embedded_secrets.py
+
+# Flet local runtime storage
+.flet/
+
+build/
+dist/
+*.spec
+
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Other local overrides
+embedded_secrets.local.py
+settings.local.json

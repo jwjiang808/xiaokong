@@ -18,6 +18,14 @@ AGENTS_MD = """# 小控工作区
 - Windows 下运行 Python 用 `python`，不要用 `python3`。
 - 用户给出外部文件或目录路径时，可直接使用 `execute` 的 PowerShell/Python 读取。
 - 内置 `read_file` 只接受工作区虚拟路径，外部路径不要交给 `read_file`。
+
+## PPT Master
+
+- 如果 `skills/ppt-master/SKILL.md` 存在，制作 PPT 时读取该技能。
+- 运行技能脚本优先使用 `skills/ppt-master/python-ppt.cmd`。
+- 如果没有便携运行时，才使用 `skills/ppt-master/.venv/Scripts/python.exe`。
+- 两者都不存在时，让用户双击 `skills/ppt-master/一键安装.cmd`。
+- `.venv` 与本机路径绑定，不要在机器之间直接复制。
 """
 
 # 只给 shell 必要的系统变量，避免把 API Key 暴露给命令。

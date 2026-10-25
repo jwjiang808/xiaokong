@@ -183,3 +183,36 @@ dist\server\xiaokong-server.exe   # 后端
 `XIAOKONG_BACKEND_URL` 改成别的地址。
 
 > 注意：`dist\server\.env` 里是真实密钥，分发时不要把它一起发出去。
+
+## 换机器与工作区
+
+EXE 只包含程序代码，不包含 `小控工作区`、SQLite 历史或 `.env`。
+首次启动后端时会自动创建：
+
+```text
+%USERPROFILE%\Documents\小控工作区\
+├── AGENTS.md
+├── xiaokong.db
+├── work/
+├── output/
+└── skills/
+```
+
+模型和豆包语音仍需要在新机器的 `dist\server\.env` 中配置。
+
+PPT Master 可以复制：
+
+```text
+skills\ppt-master\
+```
+
+不要复制其中的 `.venv`，该目录与本机环境绑定。技能目录内的 `python` 是
+离线便携运行时，需要一起复制。复制完成后双击：
+
+```text
+skills\ppt-master\一键安装.cmd
+```
+
+脚本直接使用技能目录内的 Python 和依赖完成导入测试与完整性检查，不联网，
+不需要系统 Python 或管理员权限。
+DeepAgents 会自动扫描 `skills/` 下所有带 `SKILL.md` 的目录，不需要逐个注册。

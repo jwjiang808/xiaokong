@@ -117,7 +117,7 @@ DBeaver、DataGrip）可以直接打开：
 对话区按照事件顺序显示“思考/工具折叠组 → 中间回复 → 下一组思考 → 最终回答”。
 最终回答前会显示分隔线和本轮总耗时。
 
-语音只走豆包：
+语音目前只走豆包：
 
 界面使用一个“语音交互”开关，同时控制语音自动发送和回复朗读，默认关闭。
 
@@ -129,17 +129,6 @@ DBeaver、DataGrip）可以直接打开：
 | `XIAOKONG_DOUBAO_ASR_RESOURCE_ID` | `volc.seedasr.sauc.duration` |
 | `XIAOKONG_DOUBAO_ASR_MODEL` | `bigmodel` |
 
-**绝对不能提交 Git：**
-
-| 文件 | 原因 |
-|---|---|
-| `.env`（`.env.example` 除外） | API Key、模型地址 |
-| `.venv/` | 本机虚拟环境 |
-| `.flet/` | Flet 运行时缓存 |
-| `build/`、`dist/`、`*.spec` | 构建产物 |
-| `.idea/`、`.vscode/`、`*.log` | 本地设置与日志 |
-
-以上都已写进 `.gitignore`。
 
 ## 接口
 

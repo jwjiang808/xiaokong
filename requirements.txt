@@ -6,6 +6,7 @@ python-dotenv>=1.0
 deepagents==0.7.28
 langchain-openai>=1.7,<2.0
 httpx==0.28.1
+loguru>=0.7.3
 
 # 前端
 flet==1.0.3
@@ -15,6 +16,7 @@ flet-audio==1.0.3
 flet-audio-recorder==1.0.3
 miniaudio==1.71
 numpy>=2.0
+pillow>=10
 markitdown[pdf,docx,pptx,xlsx,xls]==0.1.8
 
 # 打包

@@ -16,8 +16,8 @@ uv pip install --python ".venv\Scripts\python.exe" -e ".[packaging]"
 # 前端 EXE
 .\.venv\Scripts\flet.exe pack main.py `
     --name "小控" `
-    --product-name "小控-你的专用课程助手" `
-    --file-description "小控-你的专用课程助手" `
+    --product-name "小控" `
+    --file-description "小控" `
     --pyinstaller-build-args=--collect-data `
     --pyinstaller-build-args=magika `
     --yes

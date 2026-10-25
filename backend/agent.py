@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-import logging
 import uuid
 
 from deepagents import create_deep_agent
 from langchain_openai import ChatOpenAI
+from loguru import logger
 
-from .config import settings
+from backend.config import settings
+from backend.mcp import load_mcp_tools
+from backend.tools import TOOLS as LOCAL_TOOLS
+from backend.workspace import build_backend, workspace_dir
 
-log = logging.getLogger("xiaokong.agent")
-
-# 以后要加课程工具 / 子智能体，直接往这两个列表里加。
-TOOLS: list = []
+# 以后要加子智能体，直接往这个列表里加。
 SUBAGENTS: list = []
 SESSION_ID = uuid.uuid4().hex
 
@@ -32,14 +32,21 @@ def build_model() -> ChatOpenAI:
 
 
 def build_agent():
-    log.info(
-        "create_deep_agent model=%s base_url=%s",
+    backend = build_backend()
+    tools = [*LOCAL_TOOLS, *load_mcp_tools()]
+    logger.info(
+        "create_deep_agent model={} base_url={} workspace={} tools={}",
         settings.chat_model,
         settings.llm_base_url,
+        workspace_dir(),
+        len(tools),
     )
     return create_deep_agent(
         model=build_model(),
-        tools=TOOLS,
+        tools=tools,
+        backend=backend,
+        memory=["/AGENTS.md"],
+        skills=["/skills/"],
         subagents=SUBAGENTS or None,
         system_prompt=settings.system_prompt,
         name="xiaokong",

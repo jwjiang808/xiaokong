@@ -9,8 +9,9 @@ import re
 import flet_audio as fta
 import miniaudio
 import numpy as np
+from loguru import logger
 
-from . import api
+from frontend import api
 
 ENDINGS = "。！？!?；;\n"
 _MARKUP = re.compile(
@@ -55,6 +56,7 @@ class SpeechQueue:
         self.queue: asyncio.Queue[str | None] = asyncio.Queue()
         self.spoken: list[str] = []
         self.audio: fta.Audio | None = None
+        self.follow_task: asyncio.Task | None = None
         self.task = page.run_task(self._run)
 
     def push(self, delta: str) -> None:
@@ -74,8 +76,8 @@ class SpeechQueue:
     def cancel(self) -> None:
         if self.task and not self.task.done():
             self.task.cancel()
-        if self.audio is not None:
-            self.page.run_task(self.audio.release)
+        if self.follow_task and not self.follow_task.done():
+            self.follow_task.cancel()
         self.robot.set_speaking(False)
 
     async def _run(self) -> None:
@@ -86,8 +88,14 @@ class SpeechQueue:
                 self.spoken.append(sentence)
                 await self._play(sentence, audio)
                 sentence = await self.queue.get()
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            logger.exception("speech playback failed")
         finally:
-            self.on_finish()
+            self.robot.clear_mouth_level()
+            self.robot.set_speaking(False)
+            self.on_finish(self)
 
     async def _play(self, sentence: str, audio: bytes) -> None:
         finished = asyncio.Event()
@@ -102,6 +110,7 @@ class SpeechQueue:
 
         player = fta.Audio(
             src=audio,
+            autoplay=True,
             release_mode=fta.ReleaseMode.STOP,
             on_state_change=on_state,
         )
@@ -109,7 +118,6 @@ class SpeechQueue:
         self.page.services.append(player)
         self.page.update()
         self.robot.set_speaking(True)
-        await player.play()
 
         envelope = build_envelope(audio)
         previous = sum(len(item) for item in self.spoken[:-1])
@@ -134,13 +142,20 @@ class SpeechQueue:
             finally:
                 self.robot.clear_mouth_level()
 
-        self.page.run_task(follow)
-        with contextlib.suppress(asyncio.TimeoutError):
-            await asyncio.wait_for(finished.wait(), timeout=120)
-        self.robot.set_read_spoken(previous + len(sentence))
-
-        with contextlib.suppress(Exception):
-            await asyncio.wait_for(player.release(), timeout=2)
-        with contextlib.suppress(Exception):
-            self.page.services.remove(player)
-        self.audio = None
+        self.follow_task = self.page.run_task(follow)
+        try:
+            try:
+                await asyncio.wait_for(finished.wait(), timeout=120)
+            except asyncio.TimeoutError:
+                logger.warning("audio playback timed out: {}", sentence[:40])
+            self.robot.set_read_spoken(previous + len(sentence))
+        finally:
+            if self.follow_task and not self.follow_task.done():
+                self.follow_task.cancel()
+            self.follow_task = None
+            self.robot.clear_mouth_level()
+            with contextlib.suppress(Exception):
+                await asyncio.wait_for(player.release(), timeout=2)
+            with contextlib.suppress(Exception):
+                self.page.services.remove(player)
+            self.audio = None
